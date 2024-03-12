@@ -15,3 +15,7 @@ func (student *Student) BeforeCreate(scope *gorm.DB) error {
 	student.ID = uuid.New()
 	return nil
 }
+
+func (Student) TableName() string {
+    return "tours.students"
+}
