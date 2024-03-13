@@ -3,9 +3,7 @@ package service
 import (
 	"database-example/model"
 	"database-example/repo"
-	"encoding/json"
 	"fmt"
-	"os"
 )
 
 type StudentService struct {
@@ -22,11 +20,10 @@ func (service *StudentService) FindStudent(id string) (*model.Student, error) {
 
 func (service *StudentService) Create(student *model.Student) error {
 	err := service.StudentRepo.CreateStudent(student)
-	jsonval, _ := json.Marshal(student)
-	os.WriteFile("gas.json", jsonval, 0666)
 
 	if err != nil {
 		return err
 	}
 	return nil
 }
+
