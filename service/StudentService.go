@@ -20,8 +20,10 @@ func (service *StudentService) FindStudent(id string) (*model.Student, error) {
 
 func (service *StudentService) Create(student *model.Student) error {
 	err := service.StudentRepo.CreateStudent(student)
+
 	if err != nil {
 		return err
 	}
 	return nil
 }
+

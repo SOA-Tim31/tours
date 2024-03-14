@@ -4,10 +4,11 @@ import (
 	"database-example/handler"
 	"database-example/migration"
 	"database-example/repo"
+	"database-example/routing"
 	"database-example/service"
 	"log"
 	"net/http"
-    "database-example/routing"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -43,8 +44,13 @@ func main() {
     equipmentService := &service.EquipmentService{EquipmentRepository: equipmentRepo}
     equipmentHandler := &handler.EquipmentHandler{EquipmentService: equipmentService}
 
-    router := routing.SetupRoutes(equipmentHandler) //ovdje idu svi hendleri redom!
+	tourRepository := &repo.TourRepository{DatabaseConnection: database}
+	tourService := &service.TourService{TourRepository: tourRepository}
+	tourHandler := &handler.TourHandler{TourService: tourService}
+
+
+    router := routing.SetupRoutes(equipmentHandler, tourHandler)
 
     log.Println("Server starting...")
-    log.Fatal(http.ListenAndServe(":8080", router))
+    log.Fatal(http.ListenAndServe(":8000", router))
 }

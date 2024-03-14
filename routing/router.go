@@ -1,17 +1,22 @@
 package routing
 
 import (
-    "database-example/handler"
-    "github.com/gorilla/mux"
-    "net/http"
+	"database-example/handler"
+	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
-func SetupRoutes(handler *handler.EquipmentHandler) http.Handler {
+func SetupRoutes(handler *handler.EquipmentHandler, tourHandler *handler.TourHandler) http.Handler {
     router := mux.NewRouter().StrictSlash(true)
 
     router.HandleFunc("/equipment/{id}", handler.FindEquipmentHandler).Methods("GET")
     router.HandleFunc("/equipment", handler.CreateEquipmentHandler).Methods("POST")
     router.HandleFunc("/equipment", handler.FindAllEquipmentHandler).Methods("GET")
+
+    router.HandleFunc("/tours", tourHandler.CreateTour).Methods("POST")
+    router.HandleFunc("/tours/{id}", tourHandler.FindByID).Methods("GET")
+    router.HandleFunc("/tours", tourHandler.FindAllTours).Methods("GET")
 
     router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
 
