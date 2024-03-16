@@ -10,7 +10,7 @@ type EquipmentService struct {
 	EquipmentRepository *repo.EquipmentRepository
 }
 
-func (service *EquipmentService) FindEquipment(id string) (*model.Equipment, error) {
+func (service *EquipmentService) FindEquipment(id int) (*model.Equipment, error) {
 	equipment, err := service.EquipmentRepository.FindById(id)
 	if err != nil {
 		return nil, fmt.Errorf(fmt.Sprintf("menu item with id %s not found", id))

@@ -5,6 +5,7 @@ import (
 	"database-example/service"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -37,12 +38,20 @@ func (handler *TourHandler) FindByID(writer http.ResponseWriter, req *http.Reque
     
     tourID := mux.Vars(req)["id"]
 
-    tour, err := handler.TourService.FindById(tourID)
+	idTour, err := strconv.Atoi(tourID)
+    if err != nil {
+        writer.WriteHeader(http.StatusBadRequest)
+        writer.Write([]byte("Invalid tour ID"))
+        return
+    }
+
+    tour, err := handler.TourService.FindById(idTour)
     if err != nil {
         http.Error(writer, "Failed to find tour", http.StatusInternalServerError)
         return
     }
 
+	
     
     writer.Header().Set("Content-Type", "application/json")
     json.NewEncoder(writer).Encode(tour)

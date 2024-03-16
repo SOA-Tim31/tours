@@ -21,7 +21,7 @@ func (repo *TourRepository) Create(tour *model.Tour) error {
 	return nil
 }
 
-func (repo *TourRepository) FindById(id string) (model.Tour, error) {
+func (repo *TourRepository) FindById(id int) (model.Tour, error) {
 	tour := model.Tour{}
 	dbResult := repo.DatabaseConnection.First(&tour, "id = ?", id)
 	if dbResult != nil {

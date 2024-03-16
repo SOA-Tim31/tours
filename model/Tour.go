@@ -1,9 +1,6 @@
 package model
 
-import (
-	"github.com/google/uuid"
-	"gorm.io/gorm"
-)
+
 
 type DifficultyLevel int
 
@@ -28,16 +25,16 @@ const (
 
 
 type Tour struct {
-	ID uuid.UUID `json:"id"`
-	Name  string    `json:"name" gorm:"not null;type:string"`
-	Description  string    `json:"desc" gorm:"type:string"`
-	DifficultyLevel DifficultyLevel `json:"difficultylevel" gorm:"not null;type:int"`
-	Status Status `json:"status" gorm:"not null;type:int"`
-	Price float64 `json:"price" gorm:"not null;type:float"`
+	Id             int             `json:"Id" gorm:"primaryKey;autoIncrement;column:Id"`
+	Name           string          `json:"Name" gorm:"not null;type:string;column:Name"`
+	Description    string          `json:"Description" gorm:"type:string;column:Description"`
+	DifficultyLevel DifficultyLevel `json:"DifficultyLevel" gorm:"not null;type:int;column:DifficultyLevel"`
+	Status         Status          `json:"Status" gorm:"not null;type:int;column:Status"`
+	Price          float64         `json:"Price" gorm:"not null;type:float;column:Price"`
 }
 
-//count id before create tour
-func (t *Tour) BeforeCreate(scope *gorm.DB) error {
-	t.ID = uuid.New()
-	return nil
+
+
+func (Tour) TableName() string {
+    return "tours.Tours"
 }
