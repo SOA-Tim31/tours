@@ -5,8 +5,9 @@ import (
 	"database-example/service"
 	"encoding/json"
 	"net/http"
-	"github.com/gorilla/mux"
+	"strconv"
 
+	"github.com/gorilla/mux"
 )
 
 type TourEquipmentHandler struct {
@@ -36,13 +37,21 @@ func (handler *TourEquipmentHandler) DeleteTourEquipment(writer http.ResponseWri
     idTourParam := vars["idTour"]
     idEquipmentParam := vars["idEquipment"]
 
-    if idTourParam == "" || idEquipmentParam == "" {
+    idTour, err := strconv.Atoi(idTourParam)
+    if err != nil {
         writer.WriteHeader(http.StatusBadRequest)
-        writer.Write([]byte("Missing tour ID or equipment ID"))
+        writer.Write([]byte("Invalid tour ID"))
         return
     }
 
-    err := handler.TourEquipmentService.DeleteTourEquipment(idTourParam, idEquipmentParam)
+    idEquipment, err := strconv.Atoi(idEquipmentParam)
+    if err != nil {
+        writer.WriteHeader(http.StatusBadRequest)
+        writer.Write([]byte("Invalid equipment ID"))
+        return
+    }
+
+    err = handler.TourEquipmentService.DeleteTourEquipment(idTour, idEquipment)
     if err != nil {
         writer.WriteHeader(http.StatusInternalServerError)
         writer.Write([]byte("Error deleting tour equipment: " + err.Error()))
@@ -53,5 +62,31 @@ func (handler *TourEquipmentHandler) DeleteTourEquipment(writer http.ResponseWri
     writer.Write([]byte("Tour equipment deleted successfully"))
 }
 
+func (h *TourEquipmentHandler) GetTourEquipment(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+    idTourParam := vars["tourID"]
+    if idTourParam == "" {
+        http.Error(w, "Missing tour ID", http.StatusBadRequest)
+        return
+    }
+
+    tourID, err := strconv.Atoi(idTourParam)
+    if err != nil {
+        http.Error(w, "Invalid tour ID", http.StatusBadRequest)
+        return
+    }
+
+    equipment, err := h.TourEquipmentService.GetTourEquipment(tourID)
+    if err != nil {
+        http.Error(w, "Error fetching tour equipment: "+err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(equipment)
+
+}
 
 

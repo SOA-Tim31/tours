@@ -11,7 +11,7 @@ type TourEquipmentService struct {
 	TourEquipmentRepository *repo.TourEquipmentRepository
 }
 
-func (service *TourEquipmentService) AddEquipmentToTourAsync(tourID string, equipmentID string) error {
+func (service *TourEquipmentService) AddEquipmentToTourAsync(tourID int, equipmentID int) error {
 	allTourEquipment, _ := service.TourEquipmentRepository.FindAll()
 
 	connectionExists := false
@@ -36,8 +36,12 @@ func (service *TourEquipmentService) AddEquipmentToTourAsync(tourID string, equi
 	return nil
 }
 
-func (service *TourEquipmentService) DeleteTourEquipment(idTour, equipmentID string) error {
+func (service *TourEquipmentService) DeleteTourEquipment(idTour, equipmentID int) error {
     return service.TourEquipmentRepository.DeleteTourEquipment(idTour, equipmentID)
+}
+
+func (s *TourEquipmentService) GetTourEquipment(tourID int) ([]model.TourEquipment, error) {
+    return s.TourEquipmentRepository.GetTourEquipment(tourID)
 }
 
 

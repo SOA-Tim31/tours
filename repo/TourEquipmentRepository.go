@@ -13,6 +13,7 @@ type TourEquipmentRepository struct {
 
 
 func (repo *TourEquipmentRepository) CreateTourEquipemnt(equipmentTour *model.TourEquipment) error {
+    equipmentTour.IsSelected = true 
 	dbResult := repo.DatabaseConnection.Create(equipmentTour)
 	if dbResult.Error != nil {
 		return dbResult.Error
@@ -30,14 +31,55 @@ func (repo *TourEquipmentRepository) FindAll() ([]model.TourEquipment, error) {
     return equipments, nil
 }
 
-func (repo *TourEquipmentRepository) DeleteTourEquipment(idTour, equipmentID string) error {
+func (repo *TourEquipmentRepository) GetTourEquipment(tourID int) ([]model.TourEquipment, error) {
+    allTourEquipment, err := repo.FindAll() 
+    if err != nil {
+        return nil, err
+    }
+
+    var tourEquipmentForTour []model.TourEquipment
+    for _, te := range allTourEquipment {
+        if te.TourId == tourID {
+            tourEquipmentForTour = append(tourEquipmentForTour, te)
+        }
+    }
+
+    return tourEquipmentForTour, nil
+}
+
+// func (repo *TourEquipmentRepository) UpdateTourEquipment(equipment *model.TourEquipment) error {
+//     var existingEquipment model.TourEquipment
+//     dbResult := repo.DatabaseConnection.First(&existingEquipment, equipment.Id)
+//     if dbResult.Error != nil {
+//         return dbResult.Error
+//     }
+
+//     existingEquipment.TourId = equipment.TourId
+//     existingEquipment.EquipmentId = equipment.EquipmentId
+//     existingEquipment.IsSelected = equipment.IsSelected
+
+//     dbResult = repo.DatabaseConnection.Save(&existingEquipment)
+//     if dbResult.Error != nil {
+//         return dbResult.Error
+//     }
+
+//     println("Rows affected: ", dbResult.RowsAffected)
+//     return nil
+// }
+
+
+
+func (repo *TourEquipmentRepository) DeleteTourEquipment(idTour, equipmentID int) error {
     var equipment model.TourEquipment
-    dbResult := repo.DatabaseConnection.Where("equipment_id = ? AND tour_id = ?", equipmentID, idTour).First(&equipment)
+    equipment.IsSelected = false 
+    dbResult := repo.DatabaseConnection.First(&equipment,idTour,equipmentID)
     if dbResult.Error != nil {
         return dbResult.Error
     }
     
-    dbResult = repo.DatabaseConnection.Delete(&equipment)
+    equipment.IsSelected = false
+    
+    dbResult = repo.DatabaseConnection.Save(&equipment)
     if dbResult.Error != nil {
         return dbResult.Error
     }

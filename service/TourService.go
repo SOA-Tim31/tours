@@ -21,7 +21,7 @@ func (service *TourService) Create(tour *model.Tour) error {
 	return nil
 }
 
-func (service *TourService) FindById(id string) (*model.Tour, error){
+func (service *TourService) FindById(id int) (*model.Tour, error){
 	tour, err := service.TourRepository.FindById(id)
 	if err != nil {
 		return nil, fmt.Errorf(fmt.Sprintf("menu item with id %s not found", id))

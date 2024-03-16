@@ -5,7 +5,7 @@ import (
 	"database-example/service"
 	"encoding/json"
 	"net/http"
-
+	"strconv"
 )
 
 type EquipmentHandler struct {
@@ -25,7 +25,14 @@ func (h *EquipmentHandler) FindEquipmentHandler(w http.ResponseWriter, r *http.R
         return
     }
 
-    equipment, err := h.EquipmentService.FindEquipment(id)
+    idEquipment, err := strconv.Atoi(id)
+    if err != nil {
+        w.WriteHeader(http.StatusBadRequest)
+        w.Write([]byte("Invalid eq ID"))
+        return
+    }
+
+    equipment, err := h.EquipmentService.FindEquipment(idEquipment)
     if err != nil {
         http.Error(w, err.Error(), http.StatusNotFound)
         return

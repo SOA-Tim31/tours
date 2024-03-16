@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func SetupRoutes(handler *handler.EquipmentHandler, tourHandler *handler.TourHandler,tourEqHandler *handler.TourEquipmentHandler) http.Handler {
+func SetupRoutes(handler *handler.EquipmentHandler, tourHandler *handler.TourHandler,tourEqHandler *handler.TourEquipmentHandler,reviewHandler *handler.TourReviewHandler) http.Handler {
     router := mux.NewRouter().StrictSlash(true)
 
     router.HandleFunc("/equipment/{id}", handler.FindEquipmentHandler).Methods("GET")
@@ -22,8 +22,13 @@ func SetupRoutes(handler *handler.EquipmentHandler, tourHandler *handler.TourHan
 
 
     router.HandleFunc("/equipmentTours", tourEqHandler.CreateTourEquipemnt).Methods("POST")
-
     router.HandleFunc("/equipmentTours/{idTour}/{idEquipment}", tourEqHandler.DeleteTourEquipment).Methods("DELETE")
+    router.HandleFunc("/equipmentTours/{tourID}", tourEqHandler.GetTourEquipment).Methods("GET")
+
+
+    router.HandleFunc("/reviews", reviewHandler.Create).Methods("POST")
+    router.HandleFunc("/reviews/{id}", reviewHandler.Delete).Methods("DELETE")
+    router.HandleFunc("/reviews", reviewHandler.FindAll).Methods("GET")
 
     router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
 
