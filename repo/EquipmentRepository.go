@@ -10,7 +10,7 @@ type EquipmentRepository struct {
 	DatabaseConnection *gorm.DB
 }
 
-func (repo *EquipmentRepository) FindById(id string) (model.Equipment, error) {
+func (repo *EquipmentRepository) FindById(id int) (model.Equipment, error) {
 	equipment := model.Equipment{}
 	dbResult := repo.DatabaseConnection.First(&equipment, "id = ?", id)
 	if dbResult != nil {
