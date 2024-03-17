@@ -23,17 +23,27 @@ func (repo *TourRepository) Create(tour *model.Tour) error {
 
 func (repo *TourRepository) FindById(id int) (model.Tour, error) {
 	tour := model.Tour{}
-	dbResult := repo.DatabaseConnection.First(&tour, "id = ?", id)
+	
+	dbResult := repo.DatabaseConnection.Preload("TourPoints").First(&tour, id)
 	if dbResult != nil {
 		return tour, dbResult.Error
 	}
 	return tour, nil
 }
 
+func (repo *TourRepository) FindByUserId(userId int) ([]model.Tour, error) {
+	var tours []model.Tour
+	dbResult := repo.DatabaseConnection.Preload("TourPoints").Find(&tours, `"UserId" = ?`, userId)
+	if dbResult.Error != nil {
+        return nil, dbResult.Error
+    }
+	
+    return tours, nil
+}
 
 func (repo *TourRepository) FindAll() ([]model.Tour, error){
 	var tours []model.Tour
-	dbResult := repo.DatabaseConnection.Find(&tours)
+	dbResult := repo.DatabaseConnection.Preload("TourPoints").Find(&tours)
 	if dbResult.Error != nil {
         return nil, dbResult.Error
     }
