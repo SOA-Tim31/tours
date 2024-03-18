@@ -56,8 +56,12 @@ func main() {
 	tourReviewService := &service.TourReviewService{TourReviewRepository: tourReviewRepository}
 	tourReviewHandler := &handler.TourReviewHandler{TourReviewService: tourReviewService}
 
+	tourObjectRepository := &repo.TourObjectRepository{DatabaseConnection: database}
+	tourObjectService := &service.TourObjectService{TourObjectRepository: tourObjectRepository}
+	tourObjectHandler := &handler.TourObjectHandler{TourObjectService: tourObjectService}
 
-    router := routing.SetupRoutes(equipmentHandler, tourHandler,tourEqHandler,tourReviewHandler)
+
+    router := routing.SetupRoutes(equipmentHandler, tourHandler,tourEqHandler,tourReviewHandler,tourObjectHandler)
 
     log.Println("Server starting...")
     log.Fatal(http.ListenAndServe(":8000", router))

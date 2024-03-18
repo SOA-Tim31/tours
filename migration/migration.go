@@ -7,7 +7,7 @@ import (
 )
 
 func AutoMigrate(db *gorm.DB) error {
-    if err := db.AutoMigrate(&model.Student{}, &model.Equipment{}, &model.Tour{},&model.TourEquipment{},&model.TourReview{}); err != nil {
+    if err := db.AutoMigrate(&model.Student{}, &model.Equipment{}, &model.Tour{},&model.TourEquipment{},&model.TourReview{},&model.TourObject{}); err != nil {
         return err
     }
     return nil
