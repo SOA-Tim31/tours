@@ -114,12 +114,13 @@ func (handler *TourHandler) FindAllTours(writer http.ResponseWriter, req *http.R
 
 	writer.Header().Set("Content-Type", "application/json")
     encoder := json.NewEncoder(writer)
-    for _, tour := range tours {
-        if err := encoder.Encode(tour); err != nil {
-            http.Error(writer, err.Error(), http.StatusInternalServerError)
-            return
-        }
-    }
+	encoder.Encode(tours)
+    // for _, tour := range tours {
+    //     if err := encoder.Encode(tour); err != nil {
+    //         http.Error(writer, err.Error(), http.StatusInternalServerError)
+    //         return
+    //     }
+    // }
 }
 
 
