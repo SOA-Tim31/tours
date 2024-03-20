@@ -7,16 +7,21 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func SetupRoutes(handler *handler.EquipmentHandler, tourHandler *handler.TourHandler, tourEqHandler *handler.TourEquipmentHandler, reviewHandler *handler.TourReviewHandler, objectHandler *handler.TourObjectHandler) http.Handler {
-	router := mux.NewRouter().StrictSlash(true)
+
+func SetupRoutes(handler *handler.EquipmentHandler, tourHandler *handler.TourHandler,tourEqHandler *handler.TourEquipmentHandler,reviewHandler *handler.TourReviewHandler, tourPointHandler *handler.TourPointHandler, objectHandler *handler.TourObjectHandler, competitionHandler *handler.CompetitionHandler) http.Handler {
+    router := mux.NewRouter().StrictSlash(true)
+
 
 	router.HandleFunc("/equipment/{id}", handler.FindEquipmentHandler).Methods("GET")
 	router.HandleFunc("/equipment", handler.CreateEquipmentHandler).Methods("POST")
 	router.HandleFunc("/equipment", handler.FindAllEquipmentHandler).Methods("GET")
 
-	router.HandleFunc("/tours", tourHandler.CreateTour).Methods("POST")
-	router.HandleFunc("/tours/{id}", tourHandler.FindByID).Methods("GET")
-	router.HandleFunc("/tours", tourHandler.FindAllTours).Methods("GET")
+
+    router.HandleFunc("/tours", tourHandler.CreateTour).Methods("POST")
+    router.HandleFunc("/tours/{id}", tourHandler.FindByID).Methods("GET")
+    router.HandleFunc("/toursByUser/{userId}", tourHandler.FindByUserId).Methods("GET")
+    router.HandleFunc("/tours", tourHandler.FindAllTours).Methods("GET")
+
 
 	router.HandleFunc("/equipment", handler.CreateEquipmentHandler).Methods("POST")
 
@@ -32,7 +37,18 @@ func SetupRoutes(handler *handler.EquipmentHandler, tourHandler *handler.TourHan
     router.HandleFunc("/objects", objectHandler.Create).Methods("GET")
 
 
-	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
+
+    router.HandleFunc("/tourPoints", tourPointHandler.CreateTourPoint).Methods("POST")
+    router.HandleFunc("/tourPoints/{id}", tourPointHandler.FindByID).Methods("GET")
+    router.HandleFunc("/tourPoints", tourPointHandler.FindAllTourPoints).Methods("GET")
+    router.HandleFunc("/tourPointByTour/{tourId}", tourPointHandler.FindByTourId).Methods("GET")
+
+    router.HandleFunc("/competitions", competitionHandler.CreateCompetition).Methods("POST")
+    router.HandleFunc("/competitions/{id}", competitionHandler.FindByID).Methods("GET")
+    router.HandleFunc("/competitions", competitionHandler.FindAllCompetitions).Methods("GET")
+
+    router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static")))
+
 
 	return router
 }

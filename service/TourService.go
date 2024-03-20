@@ -34,3 +34,7 @@ func (service *TourService) FindById(id int) (*model.Tour, error){
 func (service *TourService) FindAll() ([]model.Tour, error){
    return service.TourRepository.FindAll()
 }
+
+func (service *TourService) FindByUserId(userId int) ([]model.Tour, error){
+	return service.TourRepository.FindByUserId(userId)
+ }
