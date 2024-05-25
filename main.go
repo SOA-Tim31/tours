@@ -1,80 +1,64 @@
 package main
 
 import (
+	"context"
 	"database-example/handler"
-	"database-example/migration"
 	"database-example/repo"
 	"database-example/routing"
 	"database-example/service"
+	"fmt"
 	"log"
 	"net/http"
+	"time"
 
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func initDB() *gorm.DB {
-	connectionStr := "user=postgres password=super dbname=explorer host=database port=5432 sslmode=disable search_path=tours"
-
-    database, err := gorm.Open(postgres.Open(connectionStr), &gorm.Config{})
-    if err != nil {
-        log.Fatalf("Failed to connect to database: %v", err)
-        return nil
-    }
-
-    if err := database.Exec("CREATE SCHEMA IF NOT EXISTS tours").Error; err != nil {
-        log.Fatalf("Failed to create schema: %v", err)
-        return nil
-    }
-
-    if err := migration.AutoMigrate(database); err != nil {
-        log.Fatalf("Failed to perform auto migration: %v", err)
-        return nil
-    }
-    return database
+type Tour struct {
+	Name        string
+	Description string
+	Status      int
+	Price       float32
+	UserId      int
 }
 
 func main() {
-	database := initDB()
-	if database == nil {
-		print("FAILED TO CONNECT TO DB")
-		return
-	}
-	equipmentRepo := &repo.EquipmentRepository{DatabaseConnection: database}
-    equipmentService := &service.EquipmentService{EquipmentRepository: equipmentRepo}
-    equipmentHandler := &handler.EquipmentHandler{EquipmentService: equipmentService}
+	uri := "mongodb+srv://ninakatarina:12345678NN@clusternn.dc6iczv.mongodb.net/"
+	serverAPIOptions := options.ServerAPI(options.ServerAPIVersion1)
+	clientOptions := options.Client().ApplyURI(uri).SetServerAPIOptions(serverAPIOptions)
 
-	tourRepository := &repo.TourRepository{DatabaseConnection: database}
-	tourService := &service.TourService{TourRepository: tourRepository}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, clientOptions)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Disconnect(ctx)
+	fmt.Println("Connected!")
+
+	collection := client.Database("MONGODB").Collection("tours")
+	fmt.Println(collection.Name())
+
+	tour1 := Tour{"Tura1", "lepa", 1, 400.5, 1}
+	tour2 := Tour{"Tura2", "lepa ju", 1, 450.5, 1}
+	tours := []interface{}{tour1, tour2}
+	insertManyResult, err := collection.InsertMany(context.TODO(), tours)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Inserted multiple documents: ", insertManyResult.InsertedIDs)
+
+	tourRepo, err := repo.NewTourRepository(ctx)
+	if err != nil {
+		log.Fatal("Error creating tour repository:", err)
+	}
+
+	tourService := &service.TourService{TourRepository: tourRepo}
 	tourHandler := &handler.TourHandler{TourService: tourService}
 
-	tourPointRepository := &repo.TourPointRepository{DatabaseConnection: database}
-	tourPointService := &service.TourPointService{TourPointRepository: tourPointRepository}
-	tourPointHandler := &handler.TourPointHandler{TourPointService: tourPointService}
+	router := routing.SetupRoutes(tourHandler)
 
-	tourEqRepository := &repo.TourEquipmentRepository{DatabaseConnection: database}
-	tourEqService := &service.TourEquipmentService{TourEquipmentRepository: tourEqRepository}
-	tourEqHandler := &handler.TourEquipmentHandler{TourEquipmentService: tourEqService}
-
-	tourReviewRepository := &repo.TourReviewRepository{DatabaseConnection: database}
-	tourReviewService := &service.TourReviewService{TourReviewRepository: tourReviewRepository}
-	tourReviewHandler := &handler.TourReviewHandler{TourReviewService: tourReviewService}
-
-	tourObjectRepository := &repo.TourObjectRepository{DatabaseConnection: database}
-	tourObjectService := &service.TourObjectService{TourObjectRepository: tourObjectRepository}
-	tourObjectHandler := &handler.TourObjectHandler{TourObjectService: tourObjectService}
-
-
-   
-
-	competitionRepository := &repo.CompetitionRepository{DatabaseConnection: database}
-	competitionService := &service.CompetitionService{CompetitionRepository: competitionRepository}
-	competitionHandler := &handler.CompetitionHandler{CompetitionService: competitionService}
-
-
-    router := routing.SetupRoutes(equipmentHandler, tourHandler,tourEqHandler,tourReviewHandler,tourPointHandler,tourObjectHandler, competitionHandler)
-
-
-    log.Println("Server starting...")
-    log.Fatal(http.ListenAndServe(":8000", router))
+	log.Println("Server starting...")
+	log.Fatal(http.ListenAndServe(":8000", router))
 }
