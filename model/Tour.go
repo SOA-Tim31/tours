@@ -30,7 +30,7 @@ const (
 
 
 type Tour struct {
-	ID               int             `json:"id" gorm:"primaryKey;autoIncrement;column:Id"`
+	ID               int          `json:"id" gorm:"primaryKey;autoIncrement;column:Id"`
 	Name              string          `json:"name" gorm:"not null;type:string;column:Name"`
 	Description       string          `json:"description" gorm:"type:string;column:Description"`
 	DifficultyLevel   DifficultyLevel      `json:"difficultyLevel" gorm:"not null;type:int;column:DifficultyLevel"`
